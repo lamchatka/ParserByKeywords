@@ -1,0 +1,134 @@
+Что с задачей
+
+1) Предполагаю, что браузер блокирует запрос
+2) Пытался симитировать человеческий запрос, то есть, как будто человек отправляет запрос - использовал случайно сгенерированный user-agent, подставлял в headers и передавал в request.get
+
+Какие могут быть ошибки:
+1) Попробовал то же самое проделать с гуглом, тоже не работает, что с использованием  прокси , что без
+
+
+NOTE:
+Поговорили с Никитой - решили использовать selenium.
+Доп. информация по заданию:
+
+Значит надо будет поднимать интеграцию с селениумом
+через него норм должно быть ну первое:
+
+    selenium-chrome:
+        restart: always
+        image: selenium/standalone-chrome
+        container_name: dev_novostroy_sc01
+
+это для докер-компоса движок селениума, надо чтобы сразу сделали под него:
+
+  chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--incognito')
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        chrome_options.add_argument("start-maximized")
+        chrome_options.add_argument('--disable-blink-features=AutomationControlled')
+        chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        chrome_options.add_experimental_option('useAutomationExtension', False)
+        chrome_options.add_argument(f'user-agent={userAgent}')
+
+        seleniumwire_options = {
+            'addr': 'django',
+            'proxy': {
+                'http': 'socks5://np436186:n38e7m82@elena.ltespace.com:14384',
+                'https': 'socks5://np436186:n38e7m82@elena.ltespace.com:14384',
+                'no_proxy': 'localhost,django,127.0.0.1'
+            }
+        }
+
+        browser = webdriver.Remote(
+            command_executor='http://selenium-chrome:4444/wd/hub',
+            desired_capabilities=DesiredCapabilities.CHROME,
+            options=chrome_options,
+            seleniumwire_options=seleniumwire_options
+        )
+
+        browser.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+
+а это его инициализация:
+
+from fake_useragent import UserAgent
+  ua = UserAgent()
+        userAgent = ua.random
+
+Это перед этим получение фейкового агента:
+Это с моего личного проекта, который писал года 3 назад:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+cookies = {
+    'yandexuid': '6209305721664103939',
+    'yuidss': '6209305721664103939',
+    'is_gdpr': '0',
+    'is_gdpr_b': 'COLrKxD+iwEoAg==',
+    'font_loaded': 'YSv1',
+    '_ym_uid': '1664103939679872161',
+    'my': 'YwA=',
+    'i': 'eX8w8CX6ZBDEGyuG0OutdTKurbgvbbgtuXLOhU+aIASDOqxZAIQIuh7wswRS6v9vsrhDoiqI6bZWcmKRbWkhdOQEWYo=',
+    'yandex_gid': '35',
+    'yashr': '7197006431674475670',
+    'sae': '0:13059e05-7258-4dd5-b9f3-fef7089AF250:p:22.11.5.715:w:d:RU:20211006',
+    'gdpr': '0',
+    '_ym_isad': '2',
+    '_yasc': 'uqEdrrlYXHkrf0WmowpsFVfXs+vx7VEziMOU8C6WANRJMA+RO65m7G1D08Dp9XCAqgM=',
+    'ys': 'svt.1#def_bro.1#wprid.1674561053747142-12909993198010696800-sas3-1012-26a-sas-l7-balancer-8080-BAL-2981#newsca.native_cache',
+    '_ym_d': '1674561069',
+    'yp': '1674646972.uc.ru#1674646972.duc.ru#1690329072.szm.1:1920x1080:1872x1002#1674566632.gpauto.45_035469:38_975311:100000:3:1674559432#1677067670.ygu.1#1677239485.csc.1#1989921055.pcs.1#1675080484.mcv.0#1674562869.rnwcst.3#1706097044.stltp.serp_bk-map_1_1674561044',
+}
+headers = {
+    'authority': 'ya.ru',
+    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+    'accept-language': 'ru,en;q=0.9',
+    # 'cookie': 'yandexuid=6209305721664103939; yuidss=6209305721664103939; is_gdpr=0; is_gdpr_b=COLrKxD+iwEoAg==; font_loaded=YSv1; _ym_uid=1664103939679872161; my=YwA=; i=eX8w8CX6ZBDEGyuG0OutdTKurbgvbbgtuXLOhU+aIASDOqxZAIQIuh7wswRS6v9vsrhDoiqI6bZWcmKRbWkhdOQEWYo=; yandex_gid=35; yashr=7197006431674475670; sae=0:13059e05-7258-4dd5-b9f3-fef7089AF250:p:22.11.5.715:w:d:RU:20211006; gdpr=0; _ym_isad=2; _yasc=uqEdrrlYXHkrf0WmowpsFVfXs+vx7VEziMOU8C6WANRJMA+RO65m7G1D08Dp9XCAqgM=; ys=svt.1#def_bro.1#wprid.1674561053747142-12909993198010696800-sas3-1012-26a-sas-l7-balancer-8080-BAL-2981#newsca.native_cache; _ym_d=1674561069; yp=1674646972.uc.ru#1674646972.duc.ru#1690329072.szm.1:1920x1080:1872x1002#1674566632.gpauto.45_035469:38_975311:100000:3:1674559432#1677067670.ygu.1#1677239485.csc.1#1989921055.pcs.1#1675080484.mcv.0#1674562869.rnwcst.3#1706097044.stltp.serp_bk-map_1_1674561044',
+    'device-memory': '8',
+    'downlink': '9.4',
+    'dpr': '1',
+    'ect': '4g',
+    'referer': 'https://ya.ru/',
+    'rtt': '50',
+    'sec-ch-ua': '"Chromium";v="106", "Yandex";v="22", "Not;A=Brand";v="99"',
+    'sec-ch-ua-mobile': '?0',
+    'sec-ch-ua-platform': '"Windows"',
+    'sec-fetch-dest': 'document',
+    'sec-fetch-mode': 'navigate',
+    'sec-fetch-site': 'same-origin',
+    'sec-fetch-user': '?1',
+    'serp-rendering-experiment': 'snippet-with-header',
+    'upgrade-insecure-requests': '1',
+    'user-agent': fake_ua(),
+    'viewport-width': '1920',
+    'x-ya-has-auth': '0',
+    'yandex-video-translation-enabled': '1',
+}
+
+params = {
+    'text': 'кухни зов в майкопе',
+    'lr': '35',
+    'msid': '1674561069249354-12252636008354118930-sas3-1012-26a-sas-l7-balancer-8080-BAL-9352',
+    'search_source': 'yaru_desktop_common',
+    'suggest_reqid': '620930572166410393910694681081350',
+}
