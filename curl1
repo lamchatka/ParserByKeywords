@@ -58,30 +58,18 @@ from fake_useragent import UserAgent
 
 Это перед этим получение фейкового агента:
 Это с моего личного проекта, который писал года 3 назад:
-    if browser:
-        browser.quit()
 
 
 
 
 
-# options = webdriver.ChromeOptions()
-# options.add_argument("--disable-extensions")
-# driver = Chrome(service=Service(ChromeDriverManager().install()))
-# keywords = get_keyword(query)
-# url = "https://yandex.ru/search/?text=" + keywords
-# try:
-#     driver.get(url)
-#
-#     # time.sleep(120)
-#     driver.page_source
-#     # dns = driver.find_elements(By.XPATH,'//li[@class="serp-item serp-item_card"]')
-#     # print(len(dns))
-#     # for i in dns:
-#     #     print(i.get_attribute('href'))
-#
-# except Exception as ex:
-#     print(ex)
+
+
+
+
+
+
+
 
 
 
