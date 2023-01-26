@@ -1,4 +1,4 @@
-
+import time
 
 from selenium import webdriver
 from fake_useragent import UserAgent
@@ -24,47 +24,66 @@ def get_keyword(queryList: list) -> list:
         keywords.append(query.lower().replace(" ", "+"))
     return keywords
 
-def parser(): #domens_list: list
+def parser(domen_list: list): #domens_list: list
     options = webdriver.ChromeOptions()
     options.add_argument("--disable-extensions")
     browser = Chrome(service=Service(ChromeDriverManager().install()))
-    keywords = "кухни зов в майкопе"
-    url = "https://yandex.ru/search/?text=" + keywords
-    try:
-        browser.get(url)
+    keywords = get_keyword(['кухни зов в майкопе', 'зов кухни'])
 
-        # time.sleep(120)
+    href_list = {}
+    domen_ad = 'yabs.yandex.ru'
+    for keyword in keywords:
+        url = "https://yandex.ru/search/?text=" + keyword
+        try:
+            browser.get(url)
+            time.sleep(5)
+            dns = browser.find_elements(By.XPATH,'//div[@class="Path Organic-Path path organic__path"]//a')
+            # print(len(dns))
+            href_list = {i+1: dns[i].get_attribute('href') for i in range(0, len(dns))}
 
-        # dns = driver.find_elements(By.XPATH,'//li[@class="serp-item serp-item_card"]')
-        # print(len(dns))
-        # for i in dns:
-        #     print(i.get_attribute('href'))
+        except Exception as ex:
+            logging.exception(ex)
 
-    except Exception as ex:
-        print(ex)
-    # browser = init_driver()
-    # keywords = get_keyword(queryList)
-    # try:
-    #     for keyword in keywords:
-    #         url = "https://yandex.ru/search/?text=" + keyword
-    #         browser.get(url)
-    #         a_tags = browser.find_elements(By.XPATH, "")
-    #         # list of hrefs
-    #         href_list = []
-    #         for a_tag in a_tags:
-    #            href = a_tag.get_attribute("href")
-    #            href_list.append(href)
-    #         print(href_list)
-    #
-    # except Exception as ex:
-    #     logging.exception(ex)
+        # print(href_list)
+        # browser = init_driver()
+        # keywords = get_keyword(queryList)
+        # try:
+        #     for keyword in keywords:
+        #         url = "https://yandex.ru/search/?text=" + keyword
+        #         browser.get(url)
+        #         a_tags = browser.find_elements(By.XPATH, "")
+        #         # list of hrefs
+        #         href_list = []
+        #         for a_tag in a_tags:
+        #            href = a_tag.get_attribute("href")
+        #            href_list.append(href)
+        #         print(href_list)
+        #
+        # except Exception as ex:
+        #
+        if browser:
+            browser.quit() # закрывать либо левее, либо в фор добавить инициализацию
 
-    if browser:
-        browser.quit()
+        href_list = check(href_list, domen_ad) # словарь с сайтами без рекламы
+        # print(href_list)
+        for key, value in href_list.items():
+             print(f"{key} : {value}")
+
+        print('Позиция сайта на странице:')
+        for domen in domen_list:
+            for key,value in href_list.items():
+                if value.startswith(domen, 8):  # or value.startswith(domen, 8)  domen in value.strip('/')[2]
+                    print(f"{key} : {value}")
+                    break
+
+
+def check(href_list, domen_ad) -> dict:  # проверка на рекламу
+    href_list = {key: value for key, value in href_list.items() if not value.startswith(domen_ad, 8)}
+    return href_list
 
 
 def main():
-    parser()
+    parser(['zov01.ru', '023-kuhni-lime.ru', 'maikop.mebelister.ru', 'vk.com', 'zovrus.ru']) # 023-kuhni-lime.ru
 
 
 main()
