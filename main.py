@@ -24,7 +24,8 @@ def get_keyword(queryList: list) -> list:
         keywords.append(query.lower().replace(" ", "+"))
     return keywords
 
-def parser(domen_list: list): #domens_list: list
+
+def parse(domen_list: list): #domens_list: list
     options = webdriver.ChromeOptions()
     options.add_argument("--disable-extensions")
     browser = Chrome(service=Service(ChromeDriverManager().install()))
@@ -45,22 +46,6 @@ def parser(domen_list: list): #domens_list: list
             logging.exception(ex)
 
         # print(href_list)
-        # browser = init_driver()
-        # keywords = get_keyword(queryList)
-        # try:
-        #     for keyword in keywords:
-        #         url = "https://yandex.ru/search/?text=" + keyword
-        #         browser.get(url)
-        #         a_tags = browser.find_elements(By.XPATH, "")
-        #         # list of hrefs
-        #         href_list = []
-        #         for a_tag in a_tags:
-        #            href = a_tag.get_attribute("href")
-        #            href_list.append(href)
-        #         print(href_list)
-        #
-        # except Exception as ex:
-        #
         if browser:
             browser.quit() # закрывать либо левее, либо в фор добавить инициализацию
 
@@ -83,7 +68,7 @@ def check(href_list, domen_ad) -> dict:  # проверка на рекламу
 
 
 def main():
-    parser(['zov01.ru', '023-kuhni-lime.ru', 'maikop.mebelister.ru', 'vk.com', 'zovrus.ru']) # 023-kuhni-lime.ru
+    parse(['zov01.ru', '023-kuhni-lime.ru', 'maikop.mebelister.ru', 'vk.com', 'zovrus.ru']) # 023-kuhni-lime.ru
 
 
 main()
