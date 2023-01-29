@@ -1,0 +1,4 @@
+selenium-chrome:
+        restart: always
+        image: selenium/standalone-chrome
+        container_name: dev_novostroy_sc01
