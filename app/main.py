@@ -1,15 +1,13 @@
 import os.path
 import time
-from selenium import webdriver
+# from selenium import webdriver
 from fake_useragent import UserAgent
 from selenium.webdriver.common.by import By
 import logging
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver import Chrome, DesiredCapabilities
-from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver import DesiredCapabilities
 import json
 from random import randrange
-
+from seleniumwire import webdriver
 def init_driver():
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument('--headless')
@@ -21,25 +19,24 @@ def init_driver():
     chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
     chrome_options.add_experimental_option('useAutomationExtension', False)
     chrome_options.add_argument(f'user-agent={generate_fake_ua()}')
-
     seleniumwire_options = {
         'addr': 'django',
-        'proxy': {
-            'http': 'socks5://np436186:n38e7m82@elena.ltespace.com:14384',
-            'https': 'socks5://np436186:n38e7m82@elena.ltespace.com:14384',
+        'proxies': {
+            'addr': 'django',
+            "http": "socks5://1fnvs1zk:q6q7fran@dina.ltespace.com:13574",
+            "https": "socks5://1fnvs1zk:q6q7fran@dina.ltespace.com:13574",
             'no_proxy': 'localhost,django,127.0.0.1'
         }
     }
 
     browser = webdriver.Remote(
-        command_executor='http://selenium-chrome:4444/wd/hub',
+        command_executor='http://localhost:4444/wd/hub',
         desired_capabilities=DesiredCapabilities.CHROME,
         options=chrome_options,
         seleniumwire_options=seleniumwire_options
     )
-
     browser.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
-
+    return browser
 
 def generate_fake_ua() -> UserAgent:
     ua = UserAgent()
@@ -74,9 +71,7 @@ def get_region_id_by_title(title: str, path = 'resource/new_yandex_region' ) -> 
 
 
 def parse(domain_list: list, keywords: list, region_id: int):
-    options = webdriver.ChromeOptions()
-    options.add_argument("--disable-extensions")
-    browser = Chrome(service=Service(ChromeDriverManager().install()))
+    browser = init_driver()
     # keywords = get_keywords_list(['кухни зов в майкопе', 'зов кухни'])
     href_dict = {}
     result = []
@@ -84,9 +79,9 @@ def parse(domain_list: list, keywords: list, region_id: int):
     for page in range(0,1):
         for keyword in keywords:
             if page == 0:
-                url ='https://yandex.ru/search/?text=' + keyword
+                url ='https://yandex.ru/search/?text=' + keyword + '&lr=' + str(region_id)
             else:
-                url = 'https://yandex.ru/search/?text=' + keyword + '&p=' + str(page)
+                url = 'https://yandex.ru/search/?text=' + keyword + '&lr=' + str(region_id) + '&p=' + str(page)
             try:
                 browser.get(url)
                 dns = browser.find_elements(
@@ -121,8 +116,8 @@ def check_for_ads(href_dict, domain_ad) -> dict:  # проверка на рек
 
 def main():
     query_list  =  [
-        'кухни зов в майкопе',
-        'зов кухни'
+        'кухни зов ',
+        'купить кухни'
         ]
 
     domain_list = [
@@ -133,11 +128,10 @@ def main():
          'zovrus.ru'
      ]
 
-    # result = parse(domain_list, get_keywords_list(query_list), )
-    # print('Позиция сайта на странице:')
-    # print(result) # TODO: вывод в формате json
-    # print(get_new_yandex_regions_json())
-    print(get_region_id_by_title('Балашиха'))
+    region_title = 'Краснодар'
+    result = parse(domain_list, get_keywords_list(query_list), get_region_id_by_title(region_title))
+    print('Позиция сайта на странице:')
+    print(result) # TODO: вывод в формате json
 
 
 main()

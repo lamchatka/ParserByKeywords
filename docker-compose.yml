@@ -1,4 +1,8 @@
-selenium-chrome:
-        restart: always
-        image: selenium/standalone-chrome
-        container_name: dev_novostroy_sc01
+version: '3'
+services:
+        selenium-chrome:
+                restart: always
+                image: selenium/standalone-chrome
+                container_name: parser_by_keywords_selenium
+                ports:
+                        - 4444:4444
