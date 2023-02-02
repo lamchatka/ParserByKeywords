@@ -1,6 +1,5 @@
 import os.path
 import time
-# from selenium import webdriver
 from fake_useragent import UserAgent
 from selenium.webdriver.common.by import By
 import logging
@@ -22,12 +21,12 @@ def init_driver():
     seleniumwire_options = {
         'addr': 'django',
         'proxies': {
-            'addr': 'django',
             "http": "socks5://1fnvs1zk:q6q7fran@dina.ltespace.com:13574",
             "https": "socks5://1fnvs1zk:q6q7fran@dina.ltespace.com:13574",
             'no_proxy': 'localhost,django,127.0.0.1'
         }
     }
+
 
     browser = webdriver.Remote(
         command_executor='http://localhost:4444/wd/hub',
@@ -79,7 +78,7 @@ def parse(domain_list: list, keywords: list, region_id: int):
     for page in range(0,1):
         for keyword in keywords:
             if page == 0:
-                url ='https://yandex.ru/search/?text=' + keyword + '&lr=' + str(region_id)
+                url = 'https://yandex.ru/search/?text=' + keyword + '&lr=' + str(region_id)
             else:
                 url = 'https://yandex.ru/search/?text=' + keyword + '&lr=' + str(region_id) + '&p=' + str(page)
             try:
@@ -108,8 +107,8 @@ def parse(domain_list: list, keywords: list, region_id: int):
 
     return  result
 
-
-def check_for_ads(href_dict, domain_ad) -> dict:  # проверка на рекламный домен
+ # проверка на рекламный домен
+def check_for_ads(href_dict, domain_ad) -> dict:
     href_dict = {key: value for key, value in href_dict.items() if not value.startswith(domain_ad, 8)}
     return href_dict
 
