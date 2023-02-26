@@ -1,13 +1,11 @@
 import os.path
 import time
-from fake_useragent import UserAgent
 from selenium.webdriver.common.by import By
 import logging
 from selenium.webdriver import DesiredCapabilities
 import json
 from random import randrange
 from seleniumwire import webdriver
-#from selenium import webdriver
 
 
 def init_driver() -> webdriver:
@@ -22,6 +20,7 @@ def init_driver() -> webdriver:
     chrome_options.add_experimental_option('useAutomationExtension', False)
     chrome_options.add_argument('user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, '
                                 'like Gecko) Chrome/77.0.3865.90 Safari/537.36"')
+
     seleniumwire_options = {
         'addr': 'django',  # IP-адрес машины, на которой размещен докер
         'proxies': {
@@ -78,10 +77,11 @@ def parse(domain_list: list, keywords: list, region_id: int):
         count = 0
         for keyword in keywords:
             url = 'https://yandex.ru/search/?text=' + keyword + '&lr=' + str(region_id) if page < 3 else 'https' \
-                                                                                                         '://yandex.ru/search/?text=' + keyword + '&lr=' + str(region_id) + '&p=' + str(page)
+                                                                                                         '://yandex.ru/search/?text=' + keyword + '&lr=' + str(
+                region_id) + '&p=' + str(page)
             try:
                 browser.get(url)
-                time.sleep(randrange(2, 5)) # пауза между запросами, спасение от бана или капчи
+                time.sleep(randrange(2, 5))  # пауза между запросами, спасение от бана или капчи
                 browser.get_screenshot_as_file(f"resource/screenshots/{count + page}.png")
                 dns = browser.find_elements(
                     By.XPATH, '//div[@class="Path Organic-Path path organic__path"]//a')
