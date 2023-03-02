@@ -1,11 +1,15 @@
 import os.path
 import time
+from typing import List
+
 from selenium.webdriver.common.by import By
 import logging
 from selenium.webdriver import DesiredCapabilities
 import json
 from random import randrange
 from seleniumwire import webdriver
+
+from app.data import data
 
 
 def init_driver() -> webdriver:
@@ -60,12 +64,10 @@ def get_new_yandex_regions_json():
             json.dump(data, nf, ensure_ascii=False, indent=4)
 
 
-def get_region_id_by_title(title: str, path='resource/new_yandex_region') -> int:
-    with open(path, 'r') as f:
-        data = json.load(f)
-        for elem in data:
-            if elem['title'] == title:
-                return elem['id']
+def get_region_id_by_title(title: str, data: List[dict]) -> int:
+    for elem in data:
+        if elem['title'] == title:
+            return elem['id']
 
 
 def parse(domain_list: list, keywords: list, region_id: int):
@@ -130,9 +132,10 @@ def main():
     ]
 
     region_title = 'Краснодар'
-    result = parse(domain_list, get_keywords_list(query_list), get_region_id_by_title(region_title))
+    # print(get_region_id_by_title(region_title, data))
+    result = parse(domain_list, get_keywords_list(query_list), get_region_id_by_title(region_title, data))
     print('Позиция сайта на странице:')
-    print(result)  # TODO: вывод в формате json
+    print(result)
 
 
 main()

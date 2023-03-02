@@ -3,6 +3,6 @@ services:
         selenium-chrome:
                 restart: always
                 image: selenium/standalone-chrome
-                container_name: parser_by_keywords_selenium
+                container_name: yandex_parser_by_keywords_selenium
                 ports:
-                        - 4444:4444
+                        - "4444:4444"
